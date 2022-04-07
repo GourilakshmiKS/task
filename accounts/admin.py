@@ -5,4 +5,6 @@ from .models import *
 
 admin.site.register(Custom)
 admin.site.register(Product)
+admin.site.register(Tag)
 admin.site.register(Order)
+
