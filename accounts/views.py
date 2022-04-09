@@ -2,6 +2,7 @@ from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from .models import *
 from .forms import OrderForm
+from .filters import OrderFilter
 
 def home(request):
     orders=Order.objects.all()
@@ -23,7 +24,11 @@ def customer(request,pk_test):
     customer=Custom.objects.get(id=pk_test)
     orders=customer.order_set.all()
     order_count=orders.count()
-    context={'customer':customer,'orders':orders,'order_count':order_count}
+
+    myFilter=OrderFilter(request.GET,queryset=orders)
+    orders=myFilter.qs
+
+    context={'customer':customer,'orders':orders,'order_count':order_count,'myFilter':myFilter}
     return render(request,'accounts/customer.html',context)   
 
 def createOrder(request):
@@ -52,9 +57,14 @@ def updateOrder(request,pk):
     return render(request,'accounts/order_form.html',context)
 
 def deleteOrder(request, pk):
-	order = Order.objects.get(id=pk)
-	context = {'item':order}
-	return render(request, 'accounts/delete.html', context)            
+    order = Order.objects.get(id=pk)
+    if request.method=="POST":
+        order.delete()
+        return redirect('/')
+        
+        
+    context = {'item':order}
+    return render(request, 'accounts/delete.html', context)            
 
 
 # Create your views here.
